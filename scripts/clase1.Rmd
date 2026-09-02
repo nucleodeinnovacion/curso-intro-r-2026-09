@@ -1,0 +1,14 @@
+---
+title: "Introducción al análisis de datos con R para Ciencias Sociales"
+author: "Núcleo de Innovación Social"
+date: "2026-04-15"
+output: html_document
+---
+
+## Un curso hecho desde y para las ciencias sociales
+
+<!-- ![](portada.png) -->
+```{r, fig.align="center", echo=F}
+knitr::include_graphics('../varios/portada.png')
+
+```
