@@ -1,7 +1,7 @@
 ---
 title: "Introducción al análisis de datos con R para Ciencias Sociales"
 author: "Núcleo de Innovación Social"
-date: "2026-04-15"
+date: "2026-09-02"
 output: html_document
 ---
 
