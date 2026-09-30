@@ -1,0 +1,415 @@
+---
+title: "Introducción al análisis de datos con R para Ciencias Sociales"
+subtitle: "Ejercicios de práctica — Clases 2 a 5"
+author: "Núcleo de Innovación Social"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+# error = TRUE permite knitear el archivo aunque queden ejercicios sin completar
+knitr::opts_chunk$set(echo = TRUE, error = TRUE)
+```
+
+# Cómo usar esta guía
+
+Cada ejercicio tiene un bloque de código con espacios en blanco marcados con `___`. Tu tarea es **reemplazar cada `___`** por lo que corresponda y ejecutar el chunk (`ctrl + shift + enter`).
+
+Al final de cada ejercicio hay:
+
+- 💡 **Pista**: por si te trabás.
+- ✅ **Chequeo**: lo que deberías ver si lo hiciste bien.
+
+Los ejercicios van en el orden de las clases, así que conviene hacerlos de arriba hacia abajo.
+
+```{r}
+library(tidyverse)
+options(scipen = 999)
+```
+
+---
+
+# Ejercicio 1: Objetos y operadores
+
+📚 *Clase 2*
+
+a. Creá un objeto llamado `mi_barrio` con el nombre de tu barrio y otro llamado `mi_edad` con tu edad.
+b. Preguntale a R si tu edad es mayor o igual a 30.
+c. Preguntale a R si tu barrio está incluido en el vector `barrios_sur`.
+
+```{r}
+mi_barrio <- ___
+mi_edad <- ___
+
+# b. ¿Mi edad es mayor o igual a 30?
+mi_edad ___ 30
+
+# c. ¿Mi barrio está en el sur?
+barrios_sur <- c("Barracas", "La Boca", "Pompeya", "Soldati", "Lugano")
+mi_barrio ___ barrios_sur
+```
+
+💡 **Pista**: los textos van entre comillas. Para "mayor o igual" se usa `>=` y para "está incluido en" se usa `%in%`.
+
+✅ **Chequeo**: las líneas b y c tienen que devolver `TRUE` o `FALSE`. Probá también con `!` adelante de la línea c: el resultado debería invertirse.
+
+---
+
+# Ejercicio 2: Tipos de objetos y coerción
+
+📚 *Clase 2*
+
+a. Averiguá de qué clase es cada objeto.
+b. El objeto `anio_texto` está guardado como texto. Convertilo a número y sumale 1.
+c. Convertí `nivel` a factor.
+
+```{r}
+anio_texto <- "2026"
+nivel <- c("Primario", "Secundario", "Primario", "Universitario")
+encuestado <- TRUE
+
+# a. ¿De qué clase es cada uno?
+___(anio_texto)
+___(nivel)
+___(encuestado)
+
+# b. Convertir a número y sumar 1
+anio_numero <- ___(anio_texto)
+anio_numero + 1
+
+# c. Convertir a factor
+nivel <- ___(nivel)
+class(nivel)
+```
+
+💡 **Pista**: las funciones de conversión empiezan con `as.` (por ejemplo `as.character()`). Pensá cuál sirve para números y cuál para factores.
+
+✅ **Chequeo**: en a deberías ver `"character"`, `"character"` y `"logical"`. En b, `2027`. En c, `"factor"`.
+
+---
+
+# Ejercicio 3: Vectores
+
+📚 *Clase 2*
+
+Tenemos las notas de 5 estudiantes.
+
+a. Mostrá la tercera nota.
+b. Mostrá de la segunda a la cuarta nota.
+c. Hubo un error de corrección: sumale 0.5 a todas las notas y guardalo en `notas_corregidas`.
+d. ¿Cuántas notas hay? ¿Cuál es la más alta?
+
+```{r}
+notas <- c(6, 8.5, 4, 10, 7)
+
+# a.
+notas[___]
+
+# b.
+notas[___:___]
+
+# c.
+notas_corregidas <- notas ___ 0.5
+notas_corregidas
+
+# d.
+___(notas)   # cantidad de elementos
+___(notas)   # valor máximo
+```
+
+💡 **Pista**: para cantidad de elementos se usa `length()`. Para el máximo, probá con una función de nombre muy obvio.
+
+✅ **Chequeo**: a → `4`; b → `8.5 4 10`; c → `6.5 9 4.5 10.5 7.5`; d → `5` y `10`.
+
+---
+
+# Ejercicio 4: Data frames
+
+📚 *Clase 2*
+
+a. Armá un data frame llamado `encuesta` con los tres vectores.
+b. Mirá su estructura.
+c. Mostrá los valores únicos de la columna `barrio`.
+d. Mostrá el valor de la fila 2, columna 3.
+
+```{r}
+nombre <- c("Ana", "Luis", "Marta", "Pedro")
+barrio <- c("Flores", "Almagro", "Flores", "Palermo")
+edad <- c(34, 51, 28, 45)
+
+# a.
+encuesta <- ___(nombre, barrio, edad)
+encuesta
+
+# b.
+___(encuesta)
+
+# c.
+unique(encuesta___barrio)
+
+# d.
+encuesta[___, ___]
+```
+
+💡 **Pista**: el `$` sirve para acceder a una columna. Entre corchetes, primero va la fila y después la columna.
+
+✅ **Chequeo**: b muestra 4 observaciones y 3 variables; c → `"Flores" "Almagro" "Palermo"`; d → `51`.
+
+---
+
+**Para los ejercicios 5 a 9 usamos esta base de escuelas (datos inventados, inspirados en la base de establecimientos educativos de PBA de la clase 3).** Ejecutá este chunk antes de seguir:
+
+```{r}
+escuelas <- data.frame(
+  escuela   = c("EP N°1", "EP N°5", "ES N°3", "ES N°12", "Jardín N°901",
+                "EP N°22", "ES N°7", "Jardín N°915", "EP N°40", "ES N°2"),
+  municipio = c("La Plata", "La Plata", "Quilmes", "Quilmes", "Lanús",
+                "Lanús", "Merlo", "Merlo", "Tandil", "Tandil"),
+  region    = c("Región 1", "Región 1", "Región 4", "Región 4", "Región 2",
+                "Región 2", "Región 8", "Región 8", "Región 20", "Región 20"),
+  ambito    = c("Urbano", "Urbano", "Urbano", "Rural Agrupado", "Urbano",
+                "Urbano", "Urbano", "Rural Disperso", "Rural Agrupado", "Urbano"),
+  sector    = c("Estatal", "Privado", "Estatal", "Estatal", "Estatal",
+                "Privado", "Estatal", "Estatal", "Estatal", "Privado"),
+  matricula = c(320, 180, 540, 95, 110, 260, 410, 45, 130, 300),
+  mujeres   = c(150, 95, 280, 40, 58, 120, 215, 22, 70, 150),
+  varones   = c(170, 85, 260, 55, 52, 140, 195, 23, 60, 150)
+)
+
+glimpse(escuelas)
+```
+
+---
+
+# Ejercicio 5: `select()`, `filter()` y `arrange()`
+
+📚 *Clase 3*
+
+Queremos ver **las escuelas estatales con más de 200 alumnos**, mostrando solo su nombre, municipio y matrícula, **ordenadas de mayor a menor matrícula**.
+
+```{r}
+escuelas_grandes <- escuelas %>%
+  filter(sector == ___ & matricula ___ 200) %>%
+  select(___, ___, ___) %>%
+  arrange(___(matricula))
+
+escuelas_grandes
+```
+
+💡 **Pista**: para ordenar de mayor a menor se usa `desc()` adentro de `arrange()`.
+
+✅ **Chequeo**: tienen que quedar 3 escuelas, en este orden: ES N°3 (540), ES N°7 (410) y EP N°1 (320).
+
+---
+
+# Ejercicio 6: `mutate()`, `ifelse()` y `case_when()`
+
+📚 *Clase 3*
+
+a. Creá la variable `por_mujeres` con el porcentaje de mujeres de cada escuela.
+b. Con `ifelse()`, unificá las categorías "Rural Agrupado" y "Rural Disperso" en "Rural".
+c. Con `case_when()`, creá la variable `tamanio`:
+   - "chica" si la matrícula es menor a 150
+   - "mediana" si está entre 150 y 300 (inclusive)
+   - "grande" si es mayor a 300
+
+```{r}
+escuelas <- escuelas %>%
+  mutate(
+    # a.
+    por_mujeres = (___ / ___) * 100,
+
+    # b.
+    ambito = ifelse(ambito %in% c(___, ___),
+                    "Rural",
+                    ___),
+
+    # c.
+    tamanio = case_when(
+      matricula < 150 ~ ___,
+      matricula <= 300 ~ ___,
+      matricula > 300 ~ ___
+    )
+  )
+
+# chequeamos
+unique(escuelas$ambito)
+table(escuelas$tamanio)
+```
+
+💡 **Pista**: en `ifelse()`, el tercer argumento es lo que pasa si la condición es falsa. ¿Qué valor debería quedar en las escuelas urbanas? (El nombre de la misma variable.)
+
+✅ **Chequeo**: `unique()` debería devolver solo `"Urbano"` y `"Rural"`. En la tabla: 4 chicas, 3 medianas y 3 grandes. La EP N°1 debería tener `por_mujeres` = 46.875.
+
+---
+
+# Ejercicio 7: `group_by()` y `summarise()`
+
+📚 *Clase 3*
+
+Calculá, para cada **región**, la cantidad de escuelas, la matrícula total y la matrícula promedio. Ordená de mayor a menor matrícula total.
+
+```{r}
+resumen_regiones <- escuelas %>%
+  group_by(___) %>%
+  summarise(
+    cantidad_escuelas = ___(),
+    matricula_total = ___(matricula, na.rm = TRUE),
+    matricula_promedio = ___(matricula, na.rm = TRUE)
+  ) %>%
+  arrange(desc(___))
+
+resumen_regiones
+```
+
+💡 **Pista**: `n()` cuenta filas; `sum()` suma y `mean()` promedia.
+
+✅ **Chequeo**: la primera fila es Región 4, con 2 escuelas, matrícula total 635 y promedio 317.5.
+
+🔁 **Extra**: repetí el cálculo agrupando por `sector`. Deberías obtener 1650 alumnos en escuelas estatales y 740 en privadas.
+
+---
+
+# Ejercicio 8: Pivotear tablas
+
+📚 *Clase 4*
+
+Esta tabla (datos inventados) tiene la cantidad de escuelas nuevas por municipio en formato **WIDE**: una columna por año.
+
+a. Pasala a formato **LONG** con `pivot_longer()`: una columna `anio` y una columna `escuelas_nuevas`.
+b. Volvé a pasarla a **WIDE**, pero ahora con **una columna por municipio**.
+
+```{r}
+nuevas <- data.frame(
+  municipio = c("La Plata", "Quilmes", "Tandil"),
+  `2023` = c(4, 2, 1),
+  `2024` = c(3, 5, 0),
+  `2025` = c(6, 1, 2),
+  check.names = FALSE
+)
+nuevas
+
+# a. WIDE -> LONG
+nuevas_long <- nuevas %>%
+  pivot_longer(
+    cols = c(`2023`, `2024`, `2025`),
+    names_to = ___,
+    values_to = ___
+  )
+nuevas_long
+
+# b. LONG -> WIDE (una columna por municipio)
+nuevas_wide <- nuevas_long %>%
+  pivot_wider(
+    names_from = ___,
+    values_from = ___
+  )
+nuevas_wide
+```
+
+💡 **Pista**: en `pivot_longer()` los nombres nuevos van entre comillas. En `pivot_wider()`, `names_from` indica de qué columna salen los nombres de las nuevas columnas.
+
+✅ **Chequeo**: `nuevas_long` tiene 9 filas y 3 columnas. `nuevas_wide` tiene 3 filas (una por año) y las columnas `anio`, `La Plata`, `Quilmes` y `Tandil`.
+
+---
+
+# Ejercicio 9: Joins
+
+📚 *Clase 4*
+
+Tenemos la matrícula total por municipio y, en otra tabla, la población de algunos municipios (valores aproximados). Ojo: **la clave se llama distinto en cada tabla**.
+
+a. Hacé un `left_join()` para sumarle la población a cada municipio.
+b. Hacé un `inner_join()`. ¿Cuántas filas quedan?
+c. Usá `anti_join()` para descubrir **qué municipio de la tabla de escuelas no tiene población**.
+
+```{r}
+matricula_muni <- escuelas %>%
+  group_by(municipio) %>%
+  summarise(matricula_total = sum(matricula))
+
+poblacion <- data.frame(
+  nombre_municipio = c("La Plata", "Quilmes", "Lanús", "Merlo", "Bahía Blanca"),
+  poblacion = c(770000, 640000, 460000, 600000, 340000)
+)
+
+# a.
+df_left <- matricula_muni %>%
+  ___(poblacion, by = c("municipio" = ___))
+df_left
+
+# b.
+df_inner <- matricula_muni %>%
+  ___(poblacion, by = c(___ = ___))
+nrow(df_inner)
+
+# c.
+df_anti <- matricula_muni %>%
+  ___(poblacion, by = c(___ = ___))
+df_anti
+```
+
+💡 **Pista**: dentro de `by = c("a" = "b")`, a la izquierda va el nombre de la columna en la primera tabla y a la derecha el de la segunda.
+
+✅ **Chequeo**: a → 5 filas, con `NA` en la población de Tandil; b → 4 filas; c → aparece solo Tandil.
+
+🔁 **Extra**: probá un `full_join()`. ¿Cuántas filas tiene y por qué aparece Bahía Blanca? (Deberías obtener 6.)
+
+---
+
+# Ejercicio 10: Análisis exploratorio
+
+📚 *Clase 5*
+
+Volvemos a la encuesta de sueldos del sector IT (sysarmy) que usamos en clase.
+
+a. ¿Cuántos valores faltantes tiene `salary_monthly_NETO`?
+b. Calculá la media y la mediana del salario neto. ¿Por qué son tan distintas?
+c. Calculá los cuartiles.
+d. Por `work_seniority`, calculá la mediana, el desvío estándar y la cantidad de respuestas.
+e. Hacé un histograma sin los salarios por encima del percentil 99.
+
+```{r}
+df <- read.csv("https://raw.githubusercontent.com/DiploDatos/AnalisisyVisualizacion/refs/heads/master/sysarmy_survey_2026_processed.csv",
+               encoding = "UTF-8")
+
+# a.
+sum(___(df$salary_monthly_NETO))
+
+# b.
+___(df$salary_monthly_NETO, na.rm = TRUE)
+___(df$salary_monthly_NETO, na.rm = TRUE)
+
+# c.
+quantile(df$salary_monthly_NETO, probs = c(___, ___, ___), na.rm = TRUE)
+
+# d.
+df %>%
+  group_by(___) %>%
+  summarise(
+    mediana = ___(salary_monthly_NETO, na.rm = TRUE),
+    desvio = ___(salary_monthly_NETO, na.rm = TRUE),
+    respuestas = n()
+  )
+
+# e.
+p99 <- quantile(df$salary_monthly_NETO, ___, na.rm = TRUE)
+df_sin_extremos <- df %>% filter(salary_monthly_NETO < ___)
+
+hist(df_sin_extremos$salary_monthly_NETO,
+     breaks = 50,
+     col = "salmon",
+     main = "Distribución de salarios netos",
+     xlab = "Salario")
+```
+
+💡 **Pista**: `is.na()` devuelve `TRUE` en cada faltante, y `sum()` cuenta los `TRUE`. Para el desvío estándar se usa `sd()`.
+
+✅ **Chequeo** (valores aproximados):
+
+- a → 222 faltantes.
+- b → media ≈ 3.600.000 y mediana = 2.750.000. La media es mucho más alta porque hay algunos salarios extremos que "tiran" el promedio hacia arriba.
+- c → 1.850.000 / 2.750.000 / 4.000.000.
+- d → la mediana va de ≈ 1.460.000 (Junior) a 3.400.000 (Senior).
+- e → el histograma debería verse mucho más "legible" que con todos los datos.
+
+🤔 **Para pensar**: en d, el desvío de los Senior es enorme comparado con el de los otros grupos. ¿Qué te dice eso sobre los outliers?

@@ -1,0 +1,236 @@
+---
+title: "Introducción al análisis de datos con R para Ciencias Sociales"
+subtitle: "Ejercicios de práctica — SOLUCIONES"
+author: "Núcleo de Innovación Social"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+options(scipen = 999)
+```
+
+# Ejercicio 1
+
+```{r}
+mi_barrio <- "Flores"
+mi_edad <- 34
+
+mi_edad >= 30
+
+barrios_sur <- c("Barracas", "La Boca", "Pompeya", "Soldati", "Lugano")
+mi_barrio %in% barrios_sur
+! mi_barrio %in% barrios_sur
+```
+
+# Ejercicio 2
+
+```{r}
+anio_texto <- "2026"
+nivel <- c("Primario", "Secundario", "Primario", "Universitario")
+encuestado <- TRUE
+
+class(anio_texto)
+class(nivel)
+class(encuestado)
+
+anio_numero <- as.numeric(anio_texto)
+anio_numero + 1
+
+nivel <- as.factor(nivel)
+class(nivel)
+```
+
+# Ejercicio 3
+
+```{r}
+notas <- c(6, 8.5, 4, 10, 7)
+
+notas[3]
+notas[2:4]
+
+notas_corregidas <- notas + 0.5
+notas_corregidas
+
+length(notas)
+max(notas)
+```
+
+# Ejercicio 4
+
+```{r}
+nombre <- c("Ana", "Luis", "Marta", "Pedro")
+barrio <- c("Flores", "Almagro", "Flores", "Palermo")
+edad <- c(34, 51, 28, 45)
+
+encuesta <- data.frame(nombre, barrio, edad)
+encuesta
+
+str(encuesta)
+unique(encuesta$barrio)
+encuesta[2, 3]
+```
+
+# Base de escuelas
+
+```{r}
+escuelas <- data.frame(
+  escuela   = c("EP N°1", "EP N°5", "ES N°3", "ES N°12", "Jardín N°901",
+                "EP N°22", "ES N°7", "Jardín N°915", "EP N°40", "ES N°2"),
+  municipio = c("La Plata", "La Plata", "Quilmes", "Quilmes", "Lanús",
+                "Lanús", "Merlo", "Merlo", "Tandil", "Tandil"),
+  region    = c("Región 1", "Región 1", "Región 4", "Región 4", "Región 2",
+                "Región 2", "Región 8", "Región 8", "Región 20", "Región 20"),
+  ambito    = c("Urbano", "Urbano", "Urbano", "Rural Agrupado", "Urbano",
+                "Urbano", "Urbano", "Rural Disperso", "Rural Agrupado", "Urbano"),
+  sector    = c("Estatal", "Privado", "Estatal", "Estatal", "Estatal",
+                "Privado", "Estatal", "Estatal", "Estatal", "Privado"),
+  matricula = c(320, 180, 540, 95, 110, 260, 410, 45, 130, 300),
+  mujeres   = c(150, 95, 280, 40, 58, 120, 215, 22, 70, 150),
+  varones   = c(170, 85, 260, 55, 52, 140, 195, 23, 60, 150)
+)
+```
+
+# Ejercicio 5
+
+```{r}
+escuelas_grandes <- escuelas %>%
+  filter(sector == "Estatal" & matricula > 200) %>%
+  select(escuela, municipio, matricula) %>%
+  arrange(desc(matricula))
+
+escuelas_grandes
+```
+
+# Ejercicio 6
+
+```{r}
+escuelas <- escuelas %>%
+  mutate(
+    por_mujeres = (mujeres / matricula) * 100,
+
+    ambito = ifelse(ambito %in% c("Rural Agrupado", "Rural Disperso"),
+                    "Rural",
+                    ambito),
+
+    tamanio = case_when(
+      matricula < 150 ~ "chica",
+      matricula <= 300 ~ "mediana",
+      matricula > 300 ~ "grande"
+    )
+  )
+
+unique(escuelas$ambito)
+table(escuelas$tamanio)
+```
+
+# Ejercicio 7
+
+```{r}
+resumen_regiones <- escuelas %>%
+  group_by(region) %>%
+  summarise(
+    cantidad_escuelas = n(),
+    matricula_total = sum(matricula, na.rm = TRUE),
+    matricula_promedio = mean(matricula, na.rm = TRUE)
+  ) %>%
+  arrange(desc(matricula_total))
+
+resumen_regiones
+
+# Extra
+escuelas %>%
+  group_by(sector) %>%
+  summarise(matricula_total = sum(matricula, na.rm = TRUE))
+```
+
+# Ejercicio 8
+
+```{r}
+nuevas <- data.frame(
+  municipio = c("La Plata", "Quilmes", "Tandil"),
+  `2023` = c(4, 2, 1),
+  `2024` = c(3, 5, 0),
+  `2025` = c(6, 1, 2),
+  check.names = FALSE
+)
+
+nuevas_long <- nuevas %>%
+  pivot_longer(
+    cols = c(`2023`, `2024`, `2025`),
+    names_to = "anio",
+    values_to = "escuelas_nuevas"
+  )
+nuevas_long
+
+nuevas_wide <- nuevas_long %>%
+  pivot_wider(
+    names_from = municipio,
+    values_from = escuelas_nuevas
+  )
+nuevas_wide
+```
+
+# Ejercicio 9
+
+```{r}
+matricula_muni <- escuelas %>%
+  group_by(municipio) %>%
+  summarise(matricula_total = sum(matricula))
+
+poblacion <- data.frame(
+  nombre_municipio = c("La Plata", "Quilmes", "Lanús", "Merlo", "Bahía Blanca"),
+  poblacion = c(770000, 640000, 460000, 600000, 340000)
+)
+
+df_left <- matricula_muni %>%
+  left_join(poblacion, by = c("municipio" = "nombre_municipio"))
+df_left
+
+df_inner <- matricula_muni %>%
+  inner_join(poblacion, by = c("municipio" = "nombre_municipio"))
+nrow(df_inner)
+
+df_anti <- matricula_muni %>%
+  anti_join(poblacion, by = c("municipio" = "nombre_municipio"))
+df_anti
+
+# Extra: full_join -> 6 filas (los 5 municipios de escuelas + Bahía Blanca, que solo está en poblacion)
+matricula_muni %>%
+  full_join(poblacion, by = c("municipio" = "nombre_municipio"))
+```
+
+# Ejercicio 10
+
+```{r}
+df <- read.csv("https://raw.githubusercontent.com/DiploDatos/AnalisisyVisualizacion/refs/heads/master/sysarmy_survey_2026_processed.csv",
+               encoding = "UTF-8")
+
+sum(is.na(df$salary_monthly_NETO))
+
+mean(df$salary_monthly_NETO, na.rm = TRUE)
+median(df$salary_monthly_NETO, na.rm = TRUE)
+
+quantile(df$salary_monthly_NETO, probs = c(0.25, 0.5, 0.75), na.rm = TRUE)
+
+df %>%
+  group_by(work_seniority) %>%
+  summarise(
+    mediana = median(salary_monthly_NETO, na.rm = TRUE),
+    desvio = sd(salary_monthly_NETO, na.rm = TRUE),
+    respuestas = n()
+  )
+
+p99 <- quantile(df$salary_monthly_NETO, 0.99, na.rm = TRUE)
+df_sin_extremos <- df %>% filter(salary_monthly_NETO < p99)
+
+hist(df_sin_extremos$salary_monthly_NETO,
+     breaks = 50,
+     col = "salmon",
+     main = "Distribución de salarios netos",
+     xlab = "Salario")
+```
